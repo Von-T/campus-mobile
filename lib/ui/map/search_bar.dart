@@ -34,10 +34,11 @@ class SearchBar extends HookWidget {
                     .searchBarController
                     .text
                     .isNotEmpty) {
+                  // Don't fetch on empty text field
+
                   mapHook.refetch();
 
                   /// (replaced with mapHook.refetch())
-                  // Don't fetch on empty text field
                   Provider.of<MapsDataProvider>(context, listen: false)
                       .fetchLocations(); // Text doesn't need to be sent over because it's already in the controller
                 }

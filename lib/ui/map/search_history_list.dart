@@ -52,8 +52,8 @@ class SearchHistoryList extends HookWidget {
                 mapHook.refetch();
 
                 /// (replaced with mapHook.refetch())
-                // Provider.of<MapsDataProvider>(context, listen: false)
-                //     .fetchLocations();
+                Provider.of<MapsDataProvider>(context, listen: false)
+                    .fetchLocations();
                 Navigator.pop(context);
               },
             );
