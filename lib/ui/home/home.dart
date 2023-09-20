@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:campus_mobile_experimental/app_constants.dart';
 import 'package:campus_mobile_experimental/app_styles.dart';
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
 import 'package:campus_mobile_experimental/core/models/cards.dart';
+import 'package:campus_mobile_experimental/core/models/map.dart';
 import 'package:campus_mobile_experimental/core/models/notices.dart';
 import 'package:campus_mobile_experimental/core/providers/bottom_nav.dart';
 import 'package:campus_mobile_experimental/core/providers/cards.dart';
@@ -30,17 +32,20 @@ import 'package:campus_mobile_experimental/ui/weather/weather_card.dart';
 import 'package:campus_mobile_experimental/ui/wifi/wifi_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fquery/fquery.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links2/uni_links.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatefulHookWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
   InternetConnectivityProvider? _connectivityProvider;
-  Future<Null> initUniLinks(BuildContext context) async {
+  Future<Null> initUniLinks(BuildContext context,
+      UseQueryResult<List<MapSearchModel>, dynamic> mapHook) async {
     // deep links are received by this method
     // the specific host needs to be added in AndroidManifest.xml and Info.plist
     // currently, this method handles executing custom map query
@@ -54,7 +59,7 @@ class _HomeState extends State<Home> {
       var uri = Uri.dataFromString(initialLink);
       var query = uri.queryParameters['query']!;
       // redirect query to maps tab and search with query
-      executeQuery(context, query);
+      executeQuery(context, query, mapHook);
     }
 
     // used to handle links while app is in foreground/background
@@ -64,17 +69,22 @@ class _HomeState extends State<Home> {
         var uri = Uri.dataFromString(link);
         var query = uri.queryParameters['query']!;
         // redirect query to maps tab and search with query
-        executeQuery(context, query);
+        executeQuery(context, query, mapHook);
         // received deeplink, cancel stream to prevent memory leaks
         _sub.cancel();
       }
     });
   }
 
-  void executeQuery(BuildContext context, String query) {
+  void executeQuery(BuildContext context, String query,
+      UseQueryResult<List<MapSearchModel>, dynamic> mapHook) {
     Provider.of<MapsDataProvider>(context, listen: false)
         .searchBarController
         .text = query;
+
+    mapHook.refetch();
+
+    /// (replaced with mapHook.refetch())
     Provider.of<MapsDataProvider>(context, listen: false).fetchLocations();
     Provider.of<BottomNavigationBarProvider>(context, listen: false)
         .currentIndex = NavigatorConstants.MapTab;
@@ -84,7 +94,8 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    initUniLinks(context);
+    final mapHook = useFetchMapModel();
+    initUniLinks(context, mapHook);
     _connectivityProvider = Provider.of<InternetConnectivityProvider>(context);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: cardMargin, vertical: 0.0),
