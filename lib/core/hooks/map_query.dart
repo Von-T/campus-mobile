@@ -28,12 +28,21 @@ UseQueryResult<List<MapSearchModel>, dynamic> useFetchMapModel() {
       String query = mapsProvider.searchBarController.text;
 
       /// fetch data
-      String? _response = await _networkHelper
-          .fetchData(baseEndpoint + '?query=' + query + '&region=0');
+      List<MapSearchModel> data;
+      try {
+        /// fetch data
+        String? _response = await _networkHelper
+            .fetchData(baseEndpoint + '?query=' + query + '&region=0');
+        if (_response != 'null') {
+          /// parse data
+          data = mapSearchModelFromJson(_response!);
+        } else {
+          data = [];
+        }
+      } catch (e) {
+        data = [];
+      }
       debugPrint("MapSearchModel QUERY HOOK: FETCHING DATA!");
-
-      /// parse data
-      final data = mapSearchModelFromJson(_response!);
 
       /// update the data in providers directory that is shared throughout the app
       // mapsProvider.markers.clear();
