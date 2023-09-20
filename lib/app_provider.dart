@@ -1,3 +1,4 @@
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
 import 'package:campus_mobile_experimental/core/models/location.dart';
 import 'package:campus_mobile_experimental/core/providers/bottom_nav.dart';
 import 'package:campus_mobile_experimental/core/providers/cards.dart';

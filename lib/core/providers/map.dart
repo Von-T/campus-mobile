@@ -117,6 +117,18 @@ class MapsDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateSearchHistory(String query) {
+    if (!_searchHistory.contains(query)) {
+      // Check to see if this search is already in history...
+      _searchHistory.add(query); // ...If it is not, add it...
+    } else {
+      // ...otherwise...
+      _searchHistory
+          .remove(query); // ...reorder search history to put it back on top
+      _searchHistory.add(query);
+    }
+  }
+
   void populateDistances() {
     double? latitude =
         _coordinates!.lat != null ? _coordinates!.lat : _defaultLat;
@@ -168,5 +180,9 @@ class MapsDataProvider extends ChangeNotifier {
   set mapController(GoogleMapController? value) {
     _mapController = value;
     notifyListeners();
+  }
+
+  set mapSearchModels(List<MapSearchModel> value) {
+    mapSearchModels = value;
   }
 }
