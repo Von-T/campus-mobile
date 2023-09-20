@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:campus_mobile_experimental/app_constants.dart';
 import 'package:campus_mobile_experimental/app_styles.dart';
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
 import 'package:campus_mobile_experimental/core/models/cards.dart';
 import 'package:campus_mobile_experimental/core/models/notices.dart';
 import 'package:campus_mobile_experimental/core/providers/bottom_nav.dart';
@@ -30,10 +31,11 @@ import 'package:campus_mobile_experimental/ui/weather/weather_card.dart';
 import 'package:campus_mobile_experimental/ui/wifi/wifi_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links2/uni_links.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatefulHookWidget {
   @override
   _HomeState createState() => _HomeState();
 }
@@ -84,7 +86,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final mapHooks = useFetchMapModel();
     initUniLinks(context);
+    mapHooks.refetch();
     _connectivityProvider = Provider.of<InternetConnectivityProvider>(context);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: cardMargin, vertical: 0.0),

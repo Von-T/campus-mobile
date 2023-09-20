@@ -1,5 +1,6 @@
 import 'package:campus_mobile_experimental/app_constants.dart';
 import 'package:campus_mobile_experimental/app_styles.dart';
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
 import 'package:campus_mobile_experimental/core/providers/bottom_nav.dart';
 import 'package:campus_mobile_experimental/core/providers/cards.dart';
 import 'package:campus_mobile_experimental/core/providers/map.dart';
@@ -7,10 +8,11 @@ import 'package:campus_mobile_experimental/core/providers/user.dart';
 import 'package:campus_mobile_experimental/core/utils/webview.dart';
 import 'package:campus_mobile_experimental/ui/navigator/top.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class WebViewContainer extends StatefulWidget {
+class WebViewContainer extends StatefulHookWidget {
   const WebViewContainer({
     Key? key,
     required this.titleText,
@@ -56,6 +58,7 @@ class _WebViewContainerState extends State<WebViewContainer>
 
   @override
   Widget build(BuildContext context) {
+    final mapHooks = useFetchMapModel();
     super.build(context);
     active = Provider.of<CardsDataProvider>(context).cardStates![widget.cardId];
 
@@ -71,7 +74,7 @@ class _WebViewContainerState extends State<WebViewContainer>
     checkWebURL();
 
     if (active != null && active!) {
-      return Card(
+      final card = Card(
         margin: EdgeInsets.only(
             top: 0.0, right: 0.0, bottom: cardMargin * 1.5, left: 0.0),
         semanticContainer: false,
@@ -103,6 +106,8 @@ class _WebViewContainerState extends State<WebViewContainer>
           ],
         ),
       );
+      mapHooks.refetch();
+      return card;
     }
     return Container();
   }

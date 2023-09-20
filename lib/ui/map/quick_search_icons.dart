@@ -1,15 +1,18 @@
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
 import 'package:campus_mobile_experimental/core/providers/map.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
-class QuickSearchIcons extends StatelessWidget {
+class QuickSearchIcons extends HookWidget {
   const QuickSearchIcons({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    final mapHooks = useFetchMapModel();
+    final card = Card(
       margin: EdgeInsets.all(5),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -69,6 +72,8 @@ class QuickSearchIcons extends StatelessWidget {
         ),
       ),
     );
+    mapHooks.refetch();
+    return card;
   }
 }
 

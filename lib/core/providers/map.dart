@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:campus_mobile_experimental/core/hooks/dining_query.dart';
 import 'package:campus_mobile_experimental/core/models/location.dart';
 import 'package:campus_mobile_experimental/core/models/map.dart';
 import 'package:campus_mobile_experimental/core/services/map.dart';
@@ -167,6 +168,11 @@ class MapsDataProvider extends ChangeNotifier {
 
   set mapController(GoogleMapController? value) {
     _mapController = value;
+    notifyListeners();
+  }
+
+  set mapSearchModels(List<MapSearchModel> value) {
+    _mapSearchModels = value;
     notifyListeners();
   }
 }
