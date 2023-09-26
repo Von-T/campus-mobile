@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:campus_mobile_experimental/app_constants.dart';
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
+import 'package:campus_mobile_experimental/core/models/map.dart';
 import 'package:campus_mobile_experimental/core/models/notifications.dart';
 import 'package:campus_mobile_experimental/core/providers/bottom_nav.dart';
 import 'package:campus_mobile_experimental/core/providers/map.dart';
@@ -9,6 +11,7 @@ import 'package:campus_mobile_experimental/core/providers/notifications_freefood
 import 'package:campus_mobile_experimental/ui/notifications/notifications_freefood.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:fquery/fquery.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links2/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,7 +19,8 @@ import 'package:url_launcher/url_launcher.dart';
 class NotificationsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    initUniLinks(context);
+    final mapHook = useFetchMapModel();
+    initUniLinks(context, mapHook);
     return RefreshIndicator(
       child: buildListView(context),
       onRefresh: () => Provider.of<MessagesDataProvider>(context, listen: false)
@@ -83,7 +87,8 @@ class NotificationsListView extends StatelessWidget {
     );
   }
 
-  Future<Null> initUniLinks(BuildContext context) async {
+  Future<Null> initUniLinks(BuildContext context,
+      UseQueryResult<List<MapSearchModel>, dynamic> mapHook) async {
     // deep links are received by this method
     // the specific host needs to be added in AndroidManifest.xml and Info.plist
     // currently, this method handles executing custom map query
@@ -97,7 +102,7 @@ class NotificationsListView extends StatelessWidget {
         Provider.of<MapsDataProvider>(context, listen: false)
             .searchBarController
             .text = query;
-        Provider.of<MapsDataProvider>(context, listen: false).fetchLocations();
+        mapHook.refetch();
         Provider.of<BottomNavigationBarProvider>(context, listen: false)
             .currentIndex = NavigatorConstants.MapTab;
         // received deeplink, cancel stream to prevent memory leaks

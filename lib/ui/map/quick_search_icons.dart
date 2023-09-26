@@ -1,14 +1,17 @@
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
 import 'package:campus_mobile_experimental/core/providers/map.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
-class QuickSearchIcons extends StatelessWidget {
+class QuickSearchIcons extends HookWidget {
   const QuickSearchIcons({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final mapHook = useFetchMapModel();
     return Card(
       margin: EdgeInsets.all(5),
       child: Padding(
@@ -24,8 +27,7 @@ class QuickSearchIcons extends StatelessWidget {
                 Provider.of<MapsDataProvider>(context, listen: false)
                     .searchBarController
                     .text = 'Parking';
-                Provider.of<MapsDataProvider>(context, listen: false)
-                    .fetchLocations();
+                mapHook.refetch();
                 Navigator.pop(context);
               },
             ),
@@ -36,8 +38,7 @@ class QuickSearchIcons extends StatelessWidget {
                 Provider.of<MapsDataProvider>(context, listen: false)
                     .searchBarController
                     .text = 'COVID Test Kits';
-                Provider.of<MapsDataProvider>(context, listen: false)
-                    .fetchLocations();
+                mapHook.refetch();
                 Navigator.pop(context);
               },
             ),
@@ -48,8 +49,7 @@ class QuickSearchIcons extends StatelessWidget {
                 Provider.of<MapsDataProvider>(context, listen: false)
                     .searchBarController
                     .text = 'Hydration';
-                Provider.of<MapsDataProvider>(context, listen: false)
-                    .fetchLocations();
+                mapHook.refetch();
                 Navigator.pop(context);
               },
             ),
@@ -60,8 +60,7 @@ class QuickSearchIcons extends StatelessWidget {
                 Provider.of<MapsDataProvider>(context, listen: false)
                     .searchBarController
                     .text = 'ATM';
-                Provider.of<MapsDataProvider>(context, listen: false)
-                    .fetchLocations();
+                mapHook.refetch();
                 Navigator.pop(context);
               },
             ),

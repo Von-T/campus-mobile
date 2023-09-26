@@ -1,5 +1,7 @@
 import 'package:campus_mobile_experimental/app_constants.dart';
 import 'package:campus_mobile_experimental/app_styles.dart';
+import 'package:campus_mobile_experimental/core/hooks/map_query.dart';
+import 'package:campus_mobile_experimental/core/models/map.dart';
 import 'package:campus_mobile_experimental/core/providers/bottom_nav.dart';
 import 'package:campus_mobile_experimental/core/providers/cards.dart';
 import 'package:campus_mobile_experimental/core/providers/map.dart';
@@ -7,10 +9,12 @@ import 'package:campus_mobile_experimental/core/providers/user.dart';
 import 'package:campus_mobile_experimental/core/utils/webview.dart';
 import 'package:campus_mobile_experimental/ui/navigator/top.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fquery/fquery.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class WebViewContainer extends StatefulWidget {
+class WebViewContainer extends StatefulHookWidget {
   const WebViewContainer({
     Key? key,
     required this.titleText,
@@ -56,6 +60,7 @@ class _WebViewContainerState extends State<WebViewContainer>
 
   @override
   Widget build(BuildContext context) {
+    final mapHook = useFetchMapModel();
     super.build(context);
     active = Provider.of<CardsDataProvider>(context).cardStates![widget.cardId];
 
@@ -91,7 +96,7 @@ class _WebViewContainerState extends State<WebViewContainer>
               ),
               trailing: buildMenu()!,
             ),
-            buildBody(context),
+            buildBody(context, mapHook),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: widget.actionButtons != null
@@ -108,7 +113,8 @@ class _WebViewContainerState extends State<WebViewContainer>
   }
 
   // builds the actual webview widget
-  Widget buildBody(context) {
+  Widget buildBody(
+      context, UseQueryResult<List<MapSearchModel>, dynamic> mapHook) {
     print('webview_container:buildBody: ' + webCardUrl!);
     return Container(
       height: _contentHeight,
@@ -122,7 +128,7 @@ class _WebViewContainerState extends State<WebViewContainer>
         javascriptChannels: <JavascriptChannel>[
           _linksChannel(context),
           _heightChannel(context),
-          _mapChannel(context),
+          _mapChannel(context, mapHook),
           _refreshTokenChannel(context),
           _permanentRedirect(context)
         ].toSet(),
@@ -210,7 +216,8 @@ class _WebViewContainerState extends State<WebViewContainer>
   }
 
   // channel for performing a map search based on given query
-  JavascriptChannel _mapChannel(BuildContext context) {
+  JavascriptChannel _mapChannel(BuildContext context,
+      UseQueryResult<List<MapSearchModel>, dynamic> mapHook) {
     return JavascriptChannel(
       name: 'MapSearch',
       onMessageReceived: (JavascriptMessage message) {
@@ -218,7 +225,7 @@ class _WebViewContainerState extends State<WebViewContainer>
         Provider.of<MapsDataProvider>(context, listen: false)
             .searchBarController
             .text = message.message;
-        Provider.of<MapsDataProvider>(context, listen: false).fetchLocations();
+        mapHook.refetch();
         Provider.of<BottomNavigationBarProvider>(context, listen: false)
             .currentIndex = NavigatorConstants.MapTab;
         Provider.of<CustomAppBar>(context, listen: false).changeTitle("Maps");
